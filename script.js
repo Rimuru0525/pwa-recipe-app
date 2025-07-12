@@ -1,3 +1,5 @@
+// 材料名正規化用関数をインポート
+import { normalizeIngredientName } from './ingredient_dict.js';
 // レシピ管理アプリ全体を制御するクラス
 class RecipeApp {
   // アプリ起動時に一度だけ実行される初期化処理
@@ -30,10 +32,16 @@ class RecipeApp {
     })
 
     // レシピフォーム
+    // 編集中レシピIDを保持
+    this.editingRecipeId = null;
     document.getElementById("recipe-form").addEventListener("submit", (e) => {
-      e.preventDefault()
-      this.addRecipe()
-    })
+      e.preventDefault();
+      if (this.editingRecipeId) {
+        this.saveEditedRecipe();
+      } else {
+        this.addRecipe();
+      }
+    });
 
     // 材料追加
     document.getElementById("add-ingredient").addEventListener("click", () => {
@@ -213,6 +221,7 @@ class RecipeApp {
     this.saveRecipes()
     this.renderRecipes()
     this.resetForm()
+    this.editingRecipeId = null;
 
     // 成功メッセージ
     this.showMessage("レシピが登録されました！", "success");
@@ -221,6 +230,8 @@ class RecipeApp {
   // レシピ登録フォームを初期状態に戻す処理
   resetForm() {
     document.getElementById("recipe-form").reset()
+    this.editingRecipeId = null;
+    document.querySelector(".btn-primary").textContent = "レシピを登録";
 
     // 材料行を1つにリセット
     const container = document.getElementById("ingredients-container")
@@ -267,6 +278,7 @@ class RecipeApp {
                               .join("")}
                         </div>
                     </div>
+                    <button class="btn-edit" onclick="app.editRecipe(${recipe.id})" title="編集"><i class="fas fa-pen"></i></button>
                     <button class="btn-delete" onclick="app.deleteRecipe(${recipe.id})">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -283,6 +295,85 @@ class RecipeApp {
         this.toggleRecipeSelection(recipeId)
       })
     })
+  }
+
+  // レシピ編集フォームに値をセットし、編集モードにする
+  editRecipe(id) {
+    const recipe = this.recipes.find(r => r.id === id);
+    if (!recipe) return;
+    this.editingRecipeId = id;
+    document.getElementById("recipe-name").value = recipe.name;
+    // 材料行をセット
+    const container = document.getElementById("ingredients-container");
+    container.innerHTML = "";
+    recipe.ingredients.forEach((ing, idx) => {
+      const row = document.createElement("div");
+      row.className = "ingredient-row";
+      row.innerHTML = `
+        <input type="text" placeholder="材料名" class="ingredient-name" required value="${ing.name}">
+        <input type="text" placeholder="数量" class="ingredient-quantity" value="${ing.quantity}">
+        <button type="button" class="btn-remove-ingredient" style="${idx === 0 && recipe.ingredients.length === 1 ? 'display: none;' : 'display: flex;'}">
+          <i class="fas fa-minus"></i>
+        </button>
+      `;
+      row.querySelector(".btn-remove-ingredient").addEventListener("click", () => {
+        row.remove();
+        this.updateRemoveButtons();
+      });
+      container.appendChild(row);
+    });
+    this.updateRemoveButtons();
+    // 写真
+    if (recipe.image) {
+      document.getElementById("preview-image").src = recipe.image;
+      document.getElementById("photo-upload").style.display = "none";
+      document.getElementById("photo-preview").style.display = "block";
+    } else {
+      this.removePhoto();
+    }
+    // ボタン文言変更
+    document.querySelector(".btn-primary").textContent = "レシピを編集保存";
+    // 登録タブに切り替え
+    this.switchTab("register");
+  }
+
+  // 編集保存処理
+  saveEditedRecipe() {
+    const name = document.getElementById("recipe-name").value.trim();
+    const ingredientRows = document.querySelectorAll(".ingredient-row");
+    const ingredients = [];
+    ingredientRows.forEach((row) => {
+      const ingredientName = row.querySelector(".ingredient-name").value.trim();
+      const quantity = row.querySelector(".ingredient-quantity").value.trim();
+      if (ingredientName) {
+        ingredients.push({ name: ingredientName, quantity: quantity || "" });
+      }
+    });
+    if (!name || ingredients.length === 0) {
+      alert("料理名と材料を入力してください。");
+      return;
+    }
+    let imgSrc = document.getElementById("preview-image").src;
+    if (!imgSrc || imgSrc.startsWith('data:') === false && imgSrc.indexOf('http') !== 0) {
+      imgSrc = null;
+    }
+    if (document.getElementById("photo-preview").style.display === "none") {
+      imgSrc = null;
+    }
+    // 上書き
+    const idx = this.recipes.findIndex(r => r.id === this.editingRecipeId);
+    if (idx === -1) return;
+    this.recipes[idx] = {
+      ...this.recipes[idx],
+      name,
+      ingredients,
+      image: imgSrc
+    };
+    this.saveRecipes();
+    this.renderRecipes();
+    this.resetForm();
+    this.editingRecipeId = null;
+    this.showMessage("レシピを編集保存しました！", "success");
   }
 
   // レシピの選択・非選択を切り替える関数
@@ -343,8 +434,9 @@ class RecipeApp {
 
     selectedRecipeObjects.forEach((recipe) => {
       recipe.ingredients.forEach((ingredient) => {
-        // 既存のアイテムをチェック（材料名は小文字比較）
-        const existingItem = this.shoppingList.find((item) => item.name.toLowerCase() === ingredient.name.toLowerCase())
+        // 材料名を正規化して同一材料を判定
+        const normalizedName = normalizeIngredientName(ingredient.name).toLowerCase();
+        const existingItem = this.shoppingList.find((item) => normalizeIngredientName(item.name).toLowerCase() === normalizedName)
 
         if (!existingItem) {
           this.shoppingList.push({
@@ -354,21 +446,33 @@ class RecipeApp {
             completed: false,
           })
         } else {
-          // 数量が両方とも数字なら合計
-          const isNumOld = !isNaN(existingItem.quantity) && existingItem.quantity !== ''
-          const isNumNew = !isNaN(ingredient.quantity) && ingredient.quantity !== ''
-          if (isNumOld && isNumNew) {
-            existingItem.quantity = String(Number(existingItem.quantity) + Number(ingredient.quantity))
-          } else {
-            // どちらかが数字でなければ「+」で連結（重複しないように）
-            if (existingItem.quantity && ingredient.quantity && existingItem.quantity !== ingredient.quantity) {
-              // すでに含まれていなければ追加
-              const parts = existingItem.quantity.split('+')
-              if (!parts.includes(ingredient.quantity)) {
-                existingItem.quantity += '+' + ingredient.quantity
+          // --- 数量合算ロジックを改良 ---
+          // 既存・新規のquantityを+で分割し、数値だけ合算、文字列は重複なく連結
+          const splitAndClassify = (q) => {
+            if (!q) return {nums: [], texts: []};
+            return q.split('+').reduce((acc, v) => {
+              v = v.trim();
+              if (!isNaN(v) && v !== '') {
+                acc.nums.push(Number(v));
+              } else if (v !== '') {
+                acc.texts.push(v);
               }
-            }
-          }
+              return acc;
+            }, {nums: [], texts: []});
+          };
+          const oldParts = splitAndClassify(existingItem.quantity);
+          const newParts = splitAndClassify(ingredient.quantity);
+          // 数値は合計
+          const totalNum = [...oldParts.nums, ...newParts.nums].reduce((a, b) => a + b, 0);
+          // 文字列は重複なく
+          const allTexts = [...oldParts.texts, ...newParts.texts].filter((v, i, arr) => arr.indexOf(v) === i);
+          // 合成
+          let newQuantity = '';
+          if (totalNum > 0) newQuantity += totalNum;
+          if (allTexts.length > 0) newQuantity += (newQuantity ? '+' : '') + allTexts.join('+');
+          // 両方空なら空文字
+          existingItem.quantity = newQuantity || '';
+
         }
       })
     })
@@ -604,5 +708,5 @@ class RecipeApp {
 }
 
 // アプリケーションのインスタンスを作成し、初期化処理を実行
-const app = new RecipeApp()
+window.app = new RecipeApp();
 
