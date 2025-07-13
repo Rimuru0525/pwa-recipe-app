@@ -3,8 +3,8 @@
   "short_name": "せせら飯店",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#fff8e1",
-  "theme_color": "#ff9800",
+  "background_color": "#fff0fa",
+  "theme_color": "#ff69b4",
   "icons": [
     {
       "src": "icon-192.jpg",
