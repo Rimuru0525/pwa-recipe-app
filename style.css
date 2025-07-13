@@ -25,12 +25,12 @@
   font-weight: 600;
 }
 .btn-history:hover {
-  background: linear-gradient(90deg, #fff8e1 0%, #ffe4ec 100%) !important;
+  background: linear-gradient(90deg, #ff69b4 0%, #ffe4ec 100%) !important;
   color: #8a5a1e !important;
   border-color: #ffb6d5 !important;
 }
 .btn-history:hover {
-  background: linear-gradient(90deg, #fff8e1 0%, #ffe4ec 100%);
+  background: linear-gradient(90deg, #ff69b4 0%, #ffe4ec 100%);
   color: #a05a00;
   border-color: #ffe4ec;
 }
