@@ -209,11 +209,13 @@ class RecipeApp {
     if (document.getElementById("photo-preview").style.display === "none") {
       imgSrc = null;
     }
+    const memo = document.getElementById("recipe-memo").value.trim();
     const recipe = {
       id: Date.now(),
       name: name,
       ingredients: ingredients,
       image: imgSrc,
+      memo: memo,
       createdAt: new Date().toISOString(),
     }
 
@@ -230,6 +232,7 @@ class RecipeApp {
   // レシピ登録フォームを初期状態に戻す処理
   resetForm() {
     document.getElementById("recipe-form").reset()
+    document.getElementById("recipe-memo").value = "";
     this.editingRecipeId = null;
     document.querySelector(".btn-primary").textContent = "レシピを登録";
 
@@ -265,13 +268,15 @@ class RecipeApp {
 
     container.innerHTML = this.recipes
       .map(
-        (recipe) => `
+        (recipe) => {
+          const memoHtml = recipe.memo ? `<div class="recipe-memo" style="display:none;">${recipe.memo.replace(/\n/g, '<br>')}</div>` : "";
+          return `
             <div class="recipe-item ${this.selectedRecipes.has(recipe.id) ? "selected" : ""}" data-id="${recipe.id}">
                 <div class="recipe-header">
                     <input type="checkbox" class="recipe-checkbox" ${this.selectedRecipes.has(recipe.id) ? "checked" : ""}>
                     <div class="recipe-content">
                         ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}" class="recipe-image">` : ""}
-                        <div class="recipe-name">${recipe.name}</div>
+                        <div class="recipe-name">${recipe.name} ${recipe.memo ? '<span class="memo-badge" title="タップでメモ表示"><i class="fas fa-sticky-note"></i> メモあり</span>' : ''}</div>
                         <div class="recipe-ingredients">
                             ${recipe.ingredients
                               .map((ing) => `<span class="ingredient-badge">${ing.name} ${ing.quantity}</span>`)
@@ -283,8 +288,10 @@ class RecipeApp {
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
+                ${memoHtml}
             </div>
-        `,
+          `
+        }
       )
       .join("")
 
@@ -295,6 +302,17 @@ class RecipeApp {
         this.toggleRecipeSelection(recipeId)
       })
     })
+    // レシピクリックでメモ表示トグル
+    container.querySelectorAll('.recipe-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        // 編集・削除ボタン、チェックボックスのクリックは無視
+        if (e.target.closest('.btn-edit') || e.target.closest('.btn-delete') || e.target.classList.contains('recipe-checkbox')) return;
+        const memo = item.querySelector('.recipe-memo');
+        if (memo) {
+          memo.style.display = memo.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+    });
   }
 
   // レシピ編集フォームに値をセットし、編集モードにする
@@ -331,6 +349,8 @@ class RecipeApp {
     } else {
       this.removePhoto();
     }
+    // メモ欄に既存メモを反映
+    document.getElementById("recipe-memo").value = recipe.memo || "";
     // ボタン文言変更
     document.querySelector(".btn-primary").textContent = "レシピを編集保存";
     // 登録タブに切り替え
