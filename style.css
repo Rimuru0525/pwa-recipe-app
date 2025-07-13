@@ -5,14 +5,60 @@
   box-sizing: border-box;
 }
 
+/* 編集モード（レシピ編集時）の見出し・ボタン色 */
+.editing-mode .section-title {
+  background: linear-gradient(90deg, #e1d7fa 0%, #b39ddb 100%) !important;
+  color: #5e35b1 !important;
+}
+.editing-mode .btn-primary {
+  background: linear-gradient(90deg, #e1d7fa 0%, #b39ddb 100%) !important;
+  color: #5e35b1 !important;
+  border: 1px solid #b39ddb !important;
+}
+
+/* サブボタン・小ボタン等 */
+.btn-history {
+  background: linear-gradient(90deg, #ffe4ec 0%, #ffb6d5 100%) !important;
+  color: #8a5a1e !important;
+  border: 1px solid #ffb6d5 !important;
+  box-shadow: 0 1px 2px rgba(231, 200, 161, 0.12);
+  font-weight: 600;
+}
+.btn-history:hover {
+  background: linear-gradient(90deg, #fff8e1 0%, #ffe4ec 100%) !important;
+  color: #8a5a1e !important;
+  border-color: #ffb6d5 !important;
+}
+.btn-history:hover {
+  background: linear-gradient(90deg, #fff8e1 0%, #ffe4ec 100%);
+  color: #a05a00;
+  border-color: #ffe4ec;
+}
+
+.btn-small {
+  font-size: 0.92em;
+  padding: 0.18em 0.8em;
+  border-radius: 5px;
+  min-width: 0;
+  height: 2em;
+  line-height: 1.3;
+  margin: 0;
+  background: #f7f7fa;
+  color: #666;
+  border: 1px solid #ddd;
+  box-shadow: none;
+}
+.btn-small:hover {
+  background: #ececf3;
+  color: #333;
+  border-color: #bbb;
+}
+
 /* 画面全体の基本スタイル */
 body {
-  background-image: url('background.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-color: rgba(34, 34, 34, 0.35); /* 追加: ほんのり暗い半透明 */
   font-family: 'Kiwi Maru', 'Hiragino Maru Gothic ProN', 'Yuji Mai', 'Yuji Syuku', 'Meiryo', cursive, sans-serif;
+  background: url("cafe_drink.jpg") repeat center center fixed;
+  background-size: cover;
   min-height: 100vh;
   color: #333;
 }
@@ -51,22 +97,12 @@ body {
   max-width: 480px;
   margin: 0 auto;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
-  backdrop-filter: blur(6px) saturate(140%);
-  -webkit-backdrop-filter: blur(6px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.11);
 }
 
 /* 上部のタブ切り替えボタン（登録・レシピ・買い物） */
 .tab-navigation {
   display: flex;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  backdrop-filter: blur(4px) saturate(120%);
-  -webkit-backdrop-filter: blur(4px) saturate(120%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: white;
   border-radius: 12px;
   padding: 4px;
   margin-bottom: 1.5rem;
@@ -93,7 +129,7 @@ body {
 .tab-btn.active {
   background: linear-gradient(135deg, #ffb6d5 0%, #ff69b4 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 105, 180, 0.3);
 }
 
 .tab-btn i {
@@ -111,14 +147,11 @@ body {
 
 /* 入力フォームやリスト表示のカード風デザイン */
 .card {
-  background: rgba(255, 255, 255, 0.06);
+  background: white;
   border-radius: 16px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   margin-bottom: 1rem;
-  backdrop-filter: blur(4px) saturate(120%);
-  -webkit-backdrop-filter: blur(4px) saturate(120%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .card-header {
@@ -154,16 +187,33 @@ input[type="text"], textarea {
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.2s ease;
-  font-family: inherit;
-  background: rgba(255,255,255,0.7);
-  resize: vertical;
+  background: #fff;
+  color: #333;
+  margin-bottom: 0;
   box-sizing: border-box;
+  line-height: 1.5;
+  transition: border-color 0.2s ease;
+}
+
+textarea {
+  min-height: 48px;
+  max-height: 180px;
+  resize: none;
+  font-family: inherit;
+  overflow-y: auto;
 }
 
 input[type="text"]:focus, textarea:focus {
   outline: none;
-  border-color: #ffb6d5;
+  border-color: #ff69b4;
+}
+
+.recipe-memo {
+  max-width: 100%;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  overflow-x: auto;
+  box-sizing: border-box;
 }
 
 /* 材料入力欄・追加削除ボタンのスタイル */
@@ -192,8 +242,8 @@ input[type="text"]:focus, textarea:focus {
 .btn-icon {
   width: 36px;
   height: 36px;
-  border: 2px solid #ffb6d5;
-  background: #fff;
+  border: 2px solid #ff69b4;
+  background: transparent;
   color: #ff69b4;
   border-radius: 50%;
   display: flex;
@@ -201,70 +251,30 @@ input[type="text"]:focus, textarea:focus {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(255, 182, 213, 0.15);
-  font-weight: bold;
 }
 
 .btn-icon:hover {
-  background: #ffb6d5;
-  color: #fff;
-  border-color: #ff69b4;
+  background: #ff69b4;
+  color: white;
 }
 
-.btn-edit {
-  background: none;
-  border: none;
-  color: #333;
-  border-radius: 7px;
-  margin-right: 8px;
-  cursor: pointer;
-  transition: background 0.15s;
-  display: inline-flex;
+.btn-remove-ingredient {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #f44336;
+  background: transparent;
+  color: #f44336;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
-  width: 36px;
-  padding: 0;
-  font-size: 1.25em;
-}
-
-.btn-edit i {
-  font-size: 1.25em;
-  vertical-align: middle;
-  height: 1em;
-  width: 1em;
-  display: inline-block;
-}
-
-.btn-edit:hover {
-  background: #fff0f3;
-}
-
-.btn-delete {
-  background: none;
-  border: none;
-  color: #ff5a6a;
   cursor: pointer;
-  border-radius: 7px;
-  transition: background 0.15s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  width: 36px;
-  padding: 0;
-  font-size: 1.25em;
+  transition: all 0.2s ease;
 }
 
-.btn-delete svg {
-  vertical-align: middle;
-  height: 1.25em;
-  width: 1.25em;
-  display: inline-block;
-}
-
-.btn-delete:hover {
-  background: #fff0f3;
+.btn-remove-ingredient:hover {
+  background: #f44336;
+  color: white;
 }
 
 /* 写真アップロード・プレビュー表示のスタイル */
@@ -278,7 +288,7 @@ input[type="text"]:focus, textarea:focus {
 }
 
 .photo-upload:hover {
-  border-color: #ffb6d5;
+  border-color: #ff69b4;
   background: #fff5e6;
 }
 
@@ -355,11 +365,11 @@ input[type="text"]:focus, textarea:focus {
 
 .btn-secondary:hover {
   background: #e5e5e5;
-  color: #ffb6d5;
+  color: #ff69b4;
 }
 
 #add-to-shopping {
-  background: #f87171 !important;
+  background: linear-gradient(135deg, #ffb6d5 0%, #ff69b4 100%) !important;
   color: #fff !important;
   border: none;
   border-radius: 8px;
@@ -371,7 +381,7 @@ input[type="text"]:focus, textarea:focus {
 }
 
 #add-to-shopping:hover {
-  background: #f87171 !important;
+  background: linear-gradient(135deg, #ffb6d5 0%, #ff69b4 100%) !important;
   color: #fff !important;
   font-family: 'Kiwi Maru', 'Hiragino Maru Gothic ProN', 'Yuji Mai', 'Yuji Syuku', 'Meiryo', cursive, sans-serif !important;
 }
@@ -384,30 +394,60 @@ input[type="text"]:focus, textarea:focus {
   margin-bottom: 1rem;
 }
 
-.recipes-header h2 {
-  background: linear-gradient(90deg, #ffb6d5 70%, #ff69b4 100%);
-  color: #fff;
-  border-radius: 12px;
-  padding: 0.4em 1.2em;
-  margin-bottom: 0.8em;
+.section-title {
+  background: linear-gradient(135deg, #ffb6d5 0%, #ff69b4 100%);
+  color: #fff !important;
+  border-radius: 6px;
+  padding: 0.05em 0.5em;
+  margin-bottom: 0.4em;
   display: inline-block;
-  box-shadow: 0 2px 8px rgba(255,152,0,0.10);
-
-  font-size: 1.25rem;
+  box-shadow: 0 1px 2px rgba(255,152,0,0.06);
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
 .recipe-item {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  margin-bottom: 1rem;
-  padding: 1rem;
+  /* app-cardのデザインを適用して統一 */
+  background: rgba(255,255,255,0.95);
+  border-radius: 18px;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.10);
+  margin-bottom: 1.3em;
+  padding: 1.1em 1em 1em 1em;
+  border: 1.5px solid #e9e9e9;
   transition: all 0.2s ease;
 }
 
+/* 編集・削除ボタンを縦並び＆大きなアイコン */
+.recipe-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+}
+.btn-edit, .btn-delete, .btn-favorite {
+  width: 42px;
+  height: 42px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-edit {
+  background: #fff !important;
+  border: none !important;
+  color: #2196f3 !important;
+  box-shadow: none !important;
+}
+.btn-edit i {
+  color: #2196f3 !important;
+}
+.btn-edit i, .btn-delete i {
+  font-size: 1.4rem;
+}
+
 .recipe-item.selected {
-  border: 2px solid #ffb6d5;
+  border: 2px solid #ff69b4;
   box-shadow: 0 4px 20px rgba(255, 152, 0, 0.2);
 }
 
@@ -453,37 +493,11 @@ input[type="text"]:focus, textarea:focus {
 }
 
 .ingredient-badge {
-  display: inline-block;
   background: #f5f5f5;
   color: #666;
+  padding: 4px 8px;
   border-radius: 12px;
-  padding: 4px 10px;
-  font-size: 0.92rem;
-  margin: 0 4px 4px 0;
-}
-
-.memo-badge {
-  display: inline-flex;
-  align-items: center;
-  background: linear-gradient(90deg, #ffb6d5 60%, #ff69b4 100%);
-  color: #fff;
-  font-size: 0.85rem;
-  border-radius: 10px;
-  padding: 2px 8px 2px 7px;
-  margin-left: 8px;
-  font-weight: 600;
-  box-shadow: 0 1px 4px rgba(255, 182, 213, 0.15);
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.memo-badge i {
-  margin-right: 4px;
-  font-size: 1em;
-}
-
-.memo-badge:hover {
-  background: linear-gradient(90deg, #ff69b4 60%, #ffb6d5 100%);
+  font-size: 0.75rem;
 }
 
 .btn-delete {
@@ -502,6 +516,30 @@ input[type="text"]:focus, textarea:focus {
 
 .btn-delete:hover {
   background: #ffebee;
+}
+
+.btn-favorite {
+  width: 42px;
+  height: 42px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #fff;
+  transition: color 0.2s;
+}
+.btn-favorite .fa-star {
+  color: gold;
+  background: none;
+}
+.btn-favorite .fa-star-o {
+  color: gold;
+  background: none;
+  /* 枠線だけゴールド、塗りつぶしは白 */
+  filter: drop-shadow(0 0 0 gold);
+}
+.btn-favorite:hover .fa-star-o {
+  color: gold;
 }
 
 /* 買い物リスト表示・履歴・完了ボタンのスタイル */
@@ -589,7 +627,7 @@ input[type="text"]:focus, textarea:focus {
 
 .shopping-item.completed {
   opacity: 0.6;
-  background: #fca5a51a;
+  background: #e8f5e8;
 }
 
 .shopping-checkbox {
@@ -681,6 +719,44 @@ input[type="text"]:focus, textarea:focus {
 .toast-message.toast-success {
   background: #f87171;
   color: #fff;
+}
+
+/* アプリ全体で使える濃い目のカード */
+.app-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 18px;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.10);
+  padding: 1.3em 1.1em 1.1em 1.1em;
+  margin-bottom: 1.3em;
+  border: 1.5px solid #e9e9e9;
+}
+
+/* レシピ一覧上部の操作エリア用カード（.app-cardで統一するため未使用）
+.recipe-list-header-card {
+  display:none;
+}
+*/
+
+/* 履歴モーダル */
+#history-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.history-modal-content {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.18);
+  padding: 2em 1.5em 1.5em 1.5em;
+  min-width: 320px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
 }
 
 /* データがない時の空表示スタイル */
